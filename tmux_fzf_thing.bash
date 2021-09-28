@@ -4,11 +4,13 @@
 #   Search with a min and max depth to limit depth of folder structure.
 #   Only search for type d for directories
 #   Pipe result to fuzzy finder (fzf)
+# Select the session name from the basename/folder name of the workdir.
+#   To avoid conflicts in TMUX allowed session namespace pipe to tr for replacement of dots.
 session=$(find ~/work ~/personal ~/Documents/Studier/BTH/dbwebb-kurser/ -mindepth 1 -maxdepth 1 -type d | fzf)
-session_name=$(basename "$session")
+session_name=$(basename "$session" | tr . _)
 
-echo "session: $session"
-echo "session name: $session_name"
+echo "Session: $session"
+echo "Session name: $session_name"
 
 
 # If tmux session does not exist
@@ -22,3 +24,7 @@ if ! tmux has-session -t "$session_name"; then
 
     tmux new-session -s "$session_name" -c "$session" -d
 fi
+
+
+# If new session already exists switch to it.
+tmux switch-client -t "$session_name"
